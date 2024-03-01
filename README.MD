@@ -16,6 +16,7 @@ git clone https://github.com/devsmilekang/amoreApi.git
 
 ### 2. 어플리케이션 실행
 
+jdk 17을 사용합니다.  
 프로젝트 루트 디렉토리로 이동하여 gradlew를 사용하여 프로젝트를 실행합니다.
 
 ```
