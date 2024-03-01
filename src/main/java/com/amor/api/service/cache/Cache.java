@@ -26,7 +26,7 @@ public class Cache<T> {
     }
 
     protected void increaseHitCount(){
-        if(Long.MAX_VALUE - 1 < hitCount) {
+        if(Long.MAX_VALUE - 1 > hitCount) {
             this.hitCount += 1;
         }
     }
