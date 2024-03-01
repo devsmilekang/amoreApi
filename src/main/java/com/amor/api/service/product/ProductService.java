@@ -140,7 +140,7 @@ public class ProductService {
             CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
                 boolean reloadCacheBeforeExpiration = cacheService.isReloadCacheBeforeExpiration("product_by_no_" + productNo, Duration.ofSeconds(20), 20, LocalDateTime.now());
                 if (reloadCacheBeforeExpiration) {
-                    cacheService.put("product_by_no_" + productNo, mapToProductDTO(product, product.getCategoryNo()), Duration.ofSeconds(60));
+                    cacheService.put("product_by_no_" + productNo, mapToProductDTO(product, product.getCategoryNo()), Duration.ofMinutes(10));
                 }
             });
 
@@ -151,7 +151,7 @@ public class ProductService {
 
         return productDTOOptional.orElseGet(() -> {
             ProductDTO productDTO = mapToProductDTO(product, product.getCategoryNo());
-            cacheService.put("product_by_no_" + productNo, productDTO, Duration.ofSeconds(60));
+            cacheService.put("product_by_no_" + productNo, productDTO, Duration.ofMinutes(10));
             return productDTO;
         });
     }
