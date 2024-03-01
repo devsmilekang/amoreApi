@@ -141,12 +141,11 @@ public class ProductService {
                 boolean reloadCacheBeforeExpiration = cacheService.isReloadCacheBeforeExpiration("product_by_no_" + productNo, Duration.ofSeconds(20), 20, LocalDateTime.now());
                 if (reloadCacheBeforeExpiration) {
                     cacheService.put("product_by_no_" + productNo, mapToProductDTO(product, product.getCategoryNo()), Duration.ofMinutes(10));
+                    log.debug("비동기 캐시 적재 완료! product_by_no_{}", productNo);
                 }
             });
 
-            future.thenAccept(result -> {
-                log.debug("비동기 캐시 적재 완료!");
-            });
+            future.thenAccept(result -> {});
         });
 
         return productDTOOptional.orElseGet(() -> {
