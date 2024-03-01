@@ -8,12 +8,8 @@ import org.springframework.util.StringUtils;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArraySet;
 
 @Service
 @Slf4j
@@ -21,7 +17,7 @@ public class CacheService {
 
     private final ConcurrentHashMap<String, Cache<Object>> cache = new ConcurrentHashMap<>();
     private int CACHE_MAX_SIZE = 5;
-    private final CopyOnWriteArraySet<String> cacheNames = new CopyOnWriteArraySet<>();
+    private final Set<String> cacheNames = new LinkedHashSet<>();
 
     public <T> Optional<T> get(CacheName cacheName){
         return this.get(cacheName.getCacheName());
@@ -138,7 +134,7 @@ public class CacheService {
                     .min(Map.Entry.comparingByValue(Comparator.comparingDouble(cache -> cache.calculateCallsPerSecond(LocalDateTime.now()))))
                     .map(Map.Entry::getKey);
 
-            leastUsedKey.ifPresent(cache::remove);
+            leastUsedKey.ifPresent(this::remove);
         }
     }
 
