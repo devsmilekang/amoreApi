@@ -18,7 +18,7 @@ drop table product if exists;
 
 create table product (product_no bigint not null, brand_name varchar(255), product_name varchar(255), product_price decimal(19,2), category_no integer, primary key (product_no));
 
-create Sequence product_sequence start with 1001 increment by 30;
+create Sequence product_sequence start with 1030 increment by 30;
 
 INSERT	INTO	product(product_no,	product_name,	brand_name,	product_price,	category_no)	VALUES	(1, '바이탈뷰티(아) 슬리머에스 35EA (16)', '바이탈뷰티(시판)', 112500000, 1);
 INSERT	INTO	product(product_no,	product_name,	brand_name,	product_price,	category_no)	VALUES	(2, '바이탈뷰티(아) 극진환 81G.', '바이탈뷰티(시판)', 80000000, 1);
