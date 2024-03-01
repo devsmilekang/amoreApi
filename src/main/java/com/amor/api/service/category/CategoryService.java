@@ -11,6 +11,7 @@ import com.amor.api.service.constant.CacheName;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -59,37 +60,40 @@ public class CategoryService {
             List<Category> depth1Categories = categoryRepository.findByDepth(1);
 
             List<CategoryNameDTO> categoryNameDTOS = new ArrayList<>(); // 카테고리 이름 반환 목록
-            Map<Integer, CategoryPathName> categoryPathNameMap = new HashMap<>(); // 카테고리 키를 통한 캐쉬 저장용 목록
 
             for (Category category : depth1Categories) {
-                StringBuilder categoryPathNameBuilder = new StringBuilder(category.getCategoryName());
-
-                categoryPathNameMap.put(category.getCategoryNo(), CategoryPathName.builder()
-                        .categoryNo(category.getCategoryNo())
-                        .categoryPathName(category.getCategoryName())
-                        .build());
-
-                this.appendSubCategoryPathNames(category, categoryPathNameBuilder, categoryPathNameMap);
-                categoryNameDTOS.add(new CategoryNameDTO(categoryPathNameBuilder.toString()));
+                List<String> subCategoryPathList = getSubCategoryPathList(category);
+                if (CollectionUtils.isEmpty(subCategoryPathList)) {
+                    categoryNameDTOS.add(new CategoryNameDTO(category.getCategoryName()));
+                }
+                else{
+                    for (String subCategoryPath : subCategoryPathList) {
+                        categoryNameDTOS.add(new CategoryNameDTO(category.getCategoryName() + "-" + subCategoryPath));
+                    }
+                }
             }
 
             cacheService.put(CacheName.CATEGORY_NAMES_API, categoryNameDTOS);
-            cacheService.put(CacheName.PRODUCT_CATEGORY_NAMES, categoryPathNameMap);
 
             return categoryNameDTOS;
         });
     }
 
-    private void appendSubCategoryPathNames(Category parentCategory, StringBuilder categoryPathNameBuilder, Map<Integer, CategoryPathName> categoryPathNameMap) {
-        List<Category> subCategories = categoryRepository.findByParentCategoryCategoryNo(parentCategory.getCategoryNo());
-        for (Category subCategory : subCategories) {
-            categoryPathNameBuilder.append("-").append(subCategory.getCategoryName());
-            categoryPathNameMap.put(subCategory.getCategoryNo(), CategoryPathName.builder()
-                    .categoryNo(subCategory.getCategoryNo())
-                    .categoryPathName(categoryPathNameBuilder.toString())
-                    .build());
-            this.appendSubCategoryPathNames(subCategory, categoryPathNameBuilder, categoryPathNameMap);
+    private List<String> getSubCategoryPathList(Category parentCategory){
+        List<Category> categories = categoryRepository.findByParentCategoryCategoryNo(parentCategory.getCategoryNo());
+        List<String> categoryPathList = new ArrayList<>();
+        for (Category category : categories) {
+            List<String> subCategoryPathList = getSubCategoryPathList(category);
+            if (CollectionUtils.isEmpty(subCategoryPathList)) {
+                categoryPathList.add(category.getCategoryName());
+            }
+            else{
+                for (String subCategoryPath : subCategoryPathList) {
+                    categoryPathList.add(category.getCategoryName() + "-" + subCategoryPath);
+                }
+            }
         }
+        return categoryPathList;
     }
 
     @Transactional
