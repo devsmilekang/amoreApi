@@ -33,7 +33,7 @@ spring:
     properties:
       hibernate:
         diarect: org.hibernate.dialect.H2Dialect
-        show_sql: true
+        show_sql: false
         format_sql: true
         use_sql_comments: false
         default_batch_fetch_size: 100
